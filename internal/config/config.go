@@ -171,6 +171,15 @@ func (pc *ProviderConfig) SetupClaudeCode() {
 
 func (pc *ProviderConfig) SetupGitHubCopilot() {
 	maps.Copy(pc.ExtraHeaders, copilot.Headers())
+
+	// Extract the API endpoint from the Copilot token's proxy-ep field
+	// This ensures we use the correct endpoint (e.g., api.individual.githubcopilot.com)
+	// which is required for proper quota tracking
+	if pc.OAuthToken != nil && pc.OAuthToken.AccessToken != "" {
+		if endpoint := copilot.ParseEndpointFromToken(pc.OAuthToken.AccessToken); endpoint != "" {
+			pc.BaseURL = endpoint
+		}
+	}
 }
 
 type MCPType string
